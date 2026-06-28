@@ -1,0 +1,26 @@
+import pygame
+import random
+from config.settings import *
+
+class Particle:
+    def __init__(self, x, y, big=False):
+        self.x = x
+        self.y = y
+        self.vx = random.uniform(-5.5, 5.5)
+        self.vy = random.uniform(-7, 3)
+        self.life = random.randint(25, 48) if big else random.randint(18, 36)
+        self.size = random.randint(5, 9) if big else random.randint(3, 6)
+        self.color = random.choice([YELLOW, RED, WHITE, (255, 180, 0)])
+
+    def update(self):
+        self.x += self.vx
+        self.y += self.vy
+        self.vy += 0.28          # гравитация
+        self.life -= 1
+
+    def draw(self, screen):
+        if self.life > 0:
+            alpha = int(255 * (self.life / 45))
+            s = pygame.Surface((self.size, self.size), pygame.SRCALPHA)
+            pygame.draw.circle(s, (*self.color, alpha), (self.size//2, self.size//2), self.size//2)
+            screen.blit(s, (self.x, self.y))

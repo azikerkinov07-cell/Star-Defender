@@ -1,0 +1,48 @@
+import pygame
+import random
+from config.settings import *
+
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self, enemy_type=0, is_boss=False):
+        super().__init__()
+        self.is_boss = is_boss
+
+        if is_boss:
+            self.image = pygame.Surface((90, 70), pygame.SRCALPHA)
+            pygame.draw.polygon(self.image, (180, 0, 255), [(45, 0), (0, 70), (90, 70)])
+            self.health = 18
+            self.points = 2000
+            self.speed = 3
+        else:
+            if enemy_type == 0:
+                color = RED
+                self.health = 1
+                self.points = 100
+            elif enemy_type == 1:
+                color = (255, 140, 0)
+                self.health = 1
+                self.points = 150
+            else:
+                color = (200, 0, 200)
+                self.health = 3
+                self.points = 300
+            self.image = pygame.Surface((45, 35), pygame.SRCALPHA)
+            pygame.draw.polygon(self.image, color, [(22, 0), (0, 35), (45, 35)])
+            self.speed = random.randint(3, 7) if enemy_type != 2 else 2.5
+
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randint(30, WIDTH - self.rect.width - 30)
+        self.rect.y = -100 if not is_boss else -150
+
+    def update(self):
+        self.rect.y += self.speed
+        if self.rect.top > HEIGHT:
+            self.kill()
+
+    def hit(self, create_explosion_func):
+        self.health -= 1
+        if self.health <= 0:
+            create_explosion_func(self.rect.centerx, self.rect.centery, self.is_boss)
+            self.kill()
+            return self.points
+        return 0
